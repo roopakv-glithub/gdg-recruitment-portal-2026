@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// Assumed server-owned data model:
+// - formData: applicant identity, contact details, department answers,
+//   shortlist state, and creation timestamp.
+// - user, session, account, verification: Better Auth records.
+// - users: legacy server-side user records.
+//
+// The Next.js server uses the Firebase Admin SDK for every database operation.
+// Better Auth sessions are not Firebase Authentication tokens, so browser
+// access must remain disabled. Admin SDK requests bypass these rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // No browser SDK access is required by the current architecture.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
