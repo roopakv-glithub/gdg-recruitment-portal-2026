@@ -2,6 +2,8 @@
 
 A full-stack recruitment portal for GDG on Campus. Candidates authenticate with their VIT Google account, choose up to two departments, submit department-specific responses, and review their applications. Authorized leads can review applicants, shortlist candidates, export data, and enqueue selection emails.
 
+**Production:** https://gdg-recruitment-portal-2026.vercel.app
+
 ## Architecture
 
 - **Web application:** Next.js App Router, React, Tailwind CSS, Radix UI, Framer Motion
@@ -42,6 +44,10 @@ Set these variables in Vercel for the Production environment:
 - `ADMIN_EMAILS`
 - `APPLICATION_DEADLINE` when recruitment has a fixed closing time
 - `NEXT_PUBLIC_DEMO_MODE=false`
+
+The Google OAuth web client must allow this production redirect URI:
+
+`https://gdg-recruitment-portal-2026.vercel.app/api/auth/callback/google`
 
 Do not configure `ALLOW_PASSWORD_AUTH` or `NEXT_PUBLIC_ALLOW_PASSWORD_AUTH` in production. Production login is Google-only so ownership of the VIT email address is verified by Google.
 
