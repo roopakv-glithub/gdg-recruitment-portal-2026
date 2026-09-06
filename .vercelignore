@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+*.pem
+*service-account*.json
+firebase-service-account.json
+.docx-qa/
+coverage/
+demo-server*.log
+docs/
+firestore-security-analysis.md
