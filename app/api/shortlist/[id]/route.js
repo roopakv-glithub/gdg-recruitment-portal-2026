@@ -2,7 +2,16 @@ import { NextResponse } from 'next/server';
 import { connect, serializeFirestoreData } from '@/lib/db';
 import { requireAdmin } from '@/lib/server-auth';
 import { demoMode } from '@/lib/demo';
-import { deliverQueuedEmail } from '@/lib/email-delivery';
+
+function shortlistEmail(applicant) {
+    const portalUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'https://gdg-recruitment-portal-2026.vercel.app').replace(/\/$/, '');
+    const name = String(applicant.Name || 'Applicant').trim();
+    const department = String(applicant.Department || 'your selected department').trim();
+    return {
+        subject: `You have been selected for ${department}`,
+        messageText: `Hi ${name},\n\nCongratulations! You have been selected for ${department} in Recruitment Portal 2026.\n\nYou can review your submitted application at ${portalUrl}/applications.\n\nThe recruitment team will contact you with the next steps.`,
+    };
+}
 
 export async function PATCH(req, { params }) {
     const { id } = await params;
@@ -61,7 +70,10 @@ export async function PATCH(req, { params }) {
                     const queueStatus = queueSnapshot.data()?.status;
                     if (!queueSnapshot.exists || (!wasShortlisted && (queueStatus === 'cancelled' || queueStatus === 'failed'))) {
                         transaction.set(queueRef, {
+                            ...shortlistEmail(applicant),
                             type: 'shortlisted',
+                            deliveryChannel: 'activepieces-gmail',
+                            idempotencyKey: `${id}-shortlisted`,
                             applicationId: id,
                             recipientEmail: applicant.Email,
                             recipientName: applicant.Name,
@@ -92,9 +104,7 @@ export async function PATCH(req, { params }) {
             ...serializeFirestoreData(updatedSnapshot.data()),
         };
 
-        const emailDelivery = !demoMode && shortlisted
-            ? await deliverQueuedEmail(db, `${id}-shortlisted`)
-            : { status: shortlisted ? 'demo' : 'cancelled' };
+        const emailDelivery = { status: shortlisted ? (demoMode ? 'demo' : 'queued') : 'cancelled' };
 
         return NextResponse.json({ success: true, data: applicant, emailDelivery });
     } catch (error) {

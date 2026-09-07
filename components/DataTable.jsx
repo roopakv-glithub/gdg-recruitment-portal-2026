@@ -256,7 +256,7 @@ const DataTable = ({ data }) => {
   };
 
   return (
-    <div className="bg-[#121212] flex flex-col gap-3 p-3 mt-5">
+    <div className="admin-table-shell flex flex-col gap-3 p-3 mt-5">
       <div className="flex items-start border-none justify-start gap-3 p-1 overflow-x-scroll">
         <Input
           value={globalFilter || ""}

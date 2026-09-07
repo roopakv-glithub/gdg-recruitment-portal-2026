@@ -20,7 +20,7 @@ export default async function AdminPage() {
   }));
 
   return (
-    <main>
+    <main className="admin-page">
       <NavBar />
       <AdminContent applicants={applicants} />
     </main>

@@ -362,6 +362,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .submitted-empty h2 { font-size: 25px; font-weight: 600; }
 .submitted-empty p { max-width: 510px; margin: 12px 0 24px; color: hsl(var(--muted-foreground)); line-height: 1.7; }
 .submitted-back { width: fit-content; margin-top: 26px; }
+.admin-page { min-height: 100vh; color: hsl(var(--foreground)); background: hsl(var(--background)); }
+.admin-table-shell { color: hsl(var(--foreground)); background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 14px; box-shadow: 0 8px 28px #00000012; }
+.light .admin-table-shell { box-shadow: 0 8px 28px #17213b0c; }
 .auth-card { max-width: 460px; margin: 70px auto; }
 .auth-card h1 { font-size: 30px; font-weight: 650; }
 .auth-card h2 { font-size: 22px; font-weight: 600; margin-bottom: 14px; }

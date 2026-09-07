@@ -10,7 +10,7 @@ A full-stack recruitment portal for GDG on Campus. Candidates authenticate with 
 - **Authentication:** Better Auth with Google OAuth restricted to `vitstudent.ac.in`
 - **Database:** Firebase Firestore through the Firebase Admin SDK
 - **Hosting:** Vercel Hobby
-- **Email workflow:** shortlisting writes an idempotent job to Firestore and sends through Resend when configured; pending jobs remain compatible with Activepieces and can be retried through a protected worker endpoint
+- **Email workflow:** shortlisting writes an idempotent job to Firestore; Activepieces sends it through an authorized Gmail or Google Workspace mailbox without requiring a purchased sending domain
 
 All Firestore access goes through authenticated Next.js server routes. Browser access is denied by `firestore.rules`. Application submission uses a deterministic application ID and a Firestore transaction, which prevents duplicate responses and safely enforces the two-department limit under concurrent requests.
 
@@ -46,14 +46,17 @@ Set these variables in Vercel for the Production environment:
 - `NEXT_PUBLIC_DEMO_MODE=false`
 - `NEXT_PUBLIC_APP_URL=https://gdg-recruitment-portal-2026.vercel.app`
 
-To deliver shortlist emails directly, verify a sending domain in Resend and add:
+Shortlisting creates one stable job at `emailQueue/{applicationId}-shortlisted` with the recipient, subject, plain-text message, and an idempotency key. This avoids duplicate jobs if an admin clicks twice.
 
-- `RESEND_API_KEY`
-- `EMAIL_FROM`, for example `GDG Recruitment <recruitment@updates.example.org>`
-- `EMAIL_REPLY_TO`
-- `EMAIL_WORKER_SECRET`, a long random secret used by the retry endpoint
+Configure the free email automation in Activepieces:
 
-Shortlisting creates one stable job at `emailQueue/{applicationId}-shortlisted`. The server uses the same job ID as Resend's idempotency key, claims jobs with a short processing lease, and records `sent`, `pending`, `failed`, or `cancelled` status. If delivery is temporarily unavailable, retry a single job with an authenticated `POST /api/email/process` body of `{ "jobId": "..." }`, or process up to 25 pending jobs with `{ "limit": 10 }`. Send `Authorization: Bearer EMAIL_WORKER_SECRET`. Activepieces may continue to consume the same queue when Resend is not configured.
+1. Connect Firebase/Firestore and Gmail using the recruitment mailbox.
+2. Trigger when a document is created or updated in `emailQueue`.
+3. Continue only when `status` is `pending` and `type` is `shortlisted`.
+4. Use Gmail's **Send Email** action with `recipientEmail`, `subject`, and `messageText` from the queue document.
+5. Update the same queue document to `status: sent`, with `sentAt` and the Gmail message ID. On a temporary error, keep it `pending`; after repeated failures, set it to `failed` and save a short `lastError`.
+
+Activepieces should also check `idempotencyKey` before sending. The site's Firestore transaction preserves a previously sent job when an applicant is removed and re-added, preventing a second selection email.
 
 The Google OAuth web client must allow this production redirect URI:
 
