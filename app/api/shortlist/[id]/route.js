@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connect, serializeFirestoreData } from '@/lib/db';
 import { requireAdmin } from '@/lib/server-auth';
 import { demoMode } from '@/lib/demo';
+import { deliverQueuedEmail } from '@/lib/email-delivery';
 
 function shortlistEmail(applicant) {
     const portalUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'https://gdg-recruitment-portal-2026.vercel.app').replace(/\/$/, '');
@@ -72,7 +73,7 @@ export async function PATCH(req, { params }) {
                         transaction.set(queueRef, {
                             ...shortlistEmail(applicant),
                             type: 'shortlisted',
-                            deliveryChannel: 'activepieces-gmail',
+                            deliveryChannel: 'nodemailer-smtp',
                             idempotencyKey: `${id}-shortlisted`,
                             applicationId: id,
                             recipientEmail: applicant.Email,
@@ -104,7 +105,9 @@ export async function PATCH(req, { params }) {
             ...serializeFirestoreData(updatedSnapshot.data()),
         };
 
-        const emailDelivery = { status: shortlisted ? (demoMode ? 'demo' : 'queued') : 'cancelled' };
+        const emailDelivery = !demoMode && shortlisted
+            ? await deliverQueuedEmail(db, `${id}-shortlisted`)
+            : { status: shortlisted ? 'demo' : 'cancelled' };
 
         return NextResponse.json({ success: true, data: applicant, emailDelivery });
     } catch (error) {

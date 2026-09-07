@@ -10,7 +10,7 @@ A full-stack recruitment portal for GDG on Campus. Candidates authenticate with 
 - **Authentication:** Better Auth with Google OAuth restricted to `vitstudent.ac.in`
 - **Database:** Firebase Firestore through the Firebase Admin SDK
 - **Hosting:** Vercel Hobby
-- **Email workflow:** shortlisting writes an idempotent job to Firestore; Activepieces sends it through an authorized Gmail or Google Workspace mailbox without requiring a purchased sending domain
+- **Email workflow:** shortlisting writes an idempotent job to Firestore and Nodemailer sends it through Gmail SMTP without requiring a purchased sending domain
 
 All Firestore access goes through authenticated Next.js server routes. Browser access is denied by `firestore.rules`. Application submission uses a deterministic application ID and a Firestore transaction, which prevents duplicate responses and safely enforces the two-department limit under concurrent requests.
 
@@ -46,17 +46,9 @@ Set these variables in Vercel for the Production environment:
 - `NEXT_PUBLIC_DEMO_MODE=false`
 - `NEXT_PUBLIC_APP_URL=https://gdg-recruitment-portal-2026.vercel.app`
 
-Shortlisting creates one stable job at `emailQueue/{applicationId}-shortlisted` with the recipient, subject, plain-text message, and an idempotency key. This avoids duplicate jobs if an admin clicks twice.
+Shortlisting creates one stable job at `emailQueue/{applicationId}-shortlisted` with the recipient, subject, plain-text message, and an idempotency key. Nodemailer claims that job transactionally, sends it once, and records `sent`, `pending`, `failed`, or `cancelled`. A previously sent job is preserved when an applicant is removed and re-added, preventing a second selection email.
 
-Configure the free email automation in Activepieces:
-
-1. Connect Firebase/Firestore and Gmail using the recruitment mailbox.
-2. Trigger when a document is created or updated in `emailQueue`.
-3. Continue only when `status` is `pending` and `type` is `shortlisted`.
-4. Use Gmail's **Send Email** action with `recipientEmail`, `subject`, and `messageText` from the queue document.
-5. Update the same queue document to `status: sent`, with `sentAt` and the Gmail message ID. On a temporary error, keep it `pending`; after repeated failures, set it to `failed` and save a short `lastError`.
-
-Activepieces should also check `idempotencyKey` before sending. The site's Firestore transaction preserves a previously sent job when an applicant is removed and re-added, preventing a second selection email.
+For Gmail SMTP, enable two-step verification on the sender account, create a Google app password, and configure `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_SECURE=true`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, and `EMAIL_REPLY_TO` in Vercel. Never use the normal Google account password.
 
 The Google OAuth web client must allow this production redirect URI:
 
