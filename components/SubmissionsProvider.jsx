@@ -29,7 +29,7 @@ export function SubmissionsProvider({ children }) {
 
     setIsLoadingSubmissions(true);
     try {
-      const res = await fetch(`/api/check-applications?email=${encodeURIComponent(email)}`);
+      const res = await fetch("/api/check-applications");
       const data = await res.json();
       if (data?.submittedDepartments) {
         setSubmittedDepartments(data.submittedDepartments.map(normalizeDepartmentName));

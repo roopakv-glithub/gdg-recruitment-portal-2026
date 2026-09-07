@@ -10,7 +10,7 @@ A full-stack recruitment portal for GDG on Campus. Candidates authenticate with 
 - **Authentication:** Better Auth with Google OAuth restricted to `vitstudent.ac.in`
 - **Database:** Firebase Firestore through the Firebase Admin SDK
 - **Hosting:** Vercel Hobby
-- **Email workflow:** shortlisting writes an idempotent job to the Firestore `emailQueue` collection; Activepieces can trigger from that collection and deliver the email
+- **Email workflow:** shortlisting writes an idempotent job to Firestore and sends through Resend when configured; pending jobs remain compatible with Activepieces and can be retried through a protected worker endpoint
 
 All Firestore access goes through authenticated Next.js server routes. Browser access is denied by `firestore.rules`. Application submission uses a deterministic application ID and a Firestore transaction, which prevents duplicate responses and safely enforces the two-department limit under concurrent requests.
 
@@ -44,6 +44,16 @@ Set these variables in Vercel for the Production environment:
 - `ADMIN_EMAILS`
 - `APPLICATION_DEADLINE` when recruitment has a fixed closing time
 - `NEXT_PUBLIC_DEMO_MODE=false`
+- `NEXT_PUBLIC_APP_URL=https://gdg-recruitment-portal-2026.vercel.app`
+
+To deliver shortlist emails directly, verify a sending domain in Resend and add:
+
+- `RESEND_API_KEY`
+- `EMAIL_FROM`, for example `GDG Recruitment <recruitment@updates.example.org>`
+- `EMAIL_REPLY_TO`
+- `EMAIL_WORKER_SECRET`, a long random secret used by the retry endpoint
+
+Shortlisting creates one stable job at `emailQueue/{applicationId}-shortlisted`. The server uses the same job ID as Resend's idempotency key, claims jobs with a short processing lease, and records `sent`, `pending`, `failed`, or `cancelled` status. If delivery is temporarily unavailable, retry a single job with an authenticated `POST /api/email/process` body of `{ "jobId": "..." }`, or process up to 25 pending jobs with `{ "limit": 10 }`. Send `Authorization: Bearer EMAIL_WORKER_SECRET`. Activepieces may continue to consume the same queue when Resend is not configured.
 
 The Google OAuth web client must allow this production redirect URI:
 

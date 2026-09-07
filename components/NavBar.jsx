@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserRound, LogOut } from "lucide-react";
+import { ClipboardList, UserRound, LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import ThemeToggle from "./ThemeToggle";
 
@@ -23,6 +23,10 @@ function AccountMenu({ user }) {
           <strong>{user.name || "Signed in"}</strong>
           <span>{user.email}</span>
         </div>
+        <Link href="/applications" role="menuitem">
+          <ClipboardList aria-hidden="true" />
+          My applications
+        </Link>
         <Link href="/auth/signout" role="menuitem">
           <LogOut aria-hidden="true" />
           Sign out

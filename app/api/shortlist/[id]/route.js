@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connect, serializeFirestoreData } from '@/lib/db';
 import { requireAdmin } from '@/lib/server-auth';
 import { demoMode } from '@/lib/demo';
+import { deliverQueuedEmail } from '@/lib/email-delivery';
 
 export async function PATCH(req, { params }) {
     const { id } = await params;
@@ -29,7 +30,10 @@ export async function PATCH(req, { params }) {
             await docRef.update({ shortlisted });
         } else {
             await db.runTransaction(async (transaction) => {
-                const snapshot = await transaction.get(docRef);
+                const [snapshot, queueSnapshot] = await Promise.all([
+                    transaction.get(docRef),
+                    transaction.get(queueRef),
+                ]);
                 if (!snapshot.exists) {
                     const error = new Error('Applicant not found');
                     error.code = 'NOT_FOUND';
@@ -37,6 +41,7 @@ export async function PATCH(req, { params }) {
                 }
 
                 const applicant = snapshot.data();
+                const wasShortlisted = Boolean(applicant.shortlisted);
                 transaction.update(docRef, {
                     shortlisted,
                     shortlistedAt: shortlisted ? new Date() : null,
@@ -53,24 +58,29 @@ export async function PATCH(req, { params }) {
                         selectedAt: new Date(),
                         selectedBy: session.user.email,
                     });
-                    transaction.set(queueRef, {
-                        type: 'shortlisted',
-                        applicationId: id,
-                        recipientEmail: applicant.Email,
-                        recipientName: applicant.Name,
-                        department: applicant.Department,
-                        status: 'pending',
-                        attempts: 0,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    });
+                    const queueStatus = queueSnapshot.data()?.status;
+                    if (!queueSnapshot.exists || (!wasShortlisted && (queueStatus === 'cancelled' || queueStatus === 'failed'))) {
+                        transaction.set(queueRef, {
+                            type: 'shortlisted',
+                            applicationId: id,
+                            recipientEmail: applicant.Email,
+                            recipientName: applicant.Name,
+                            department: applicant.Department,
+                            status: 'pending',
+                            attempts: 0,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        });
+                    }
                 } else {
                     transaction.delete(selectedRef);
-                    transaction.set(queueRef, {
-                        status: 'cancelled',
-                        cancelledAt: new Date(),
-                        updatedAt: new Date(),
-                    }, { merge: true });
+                    if (queueSnapshot.exists && queueSnapshot.data()?.status !== 'sent') {
+                        transaction.set(queueRef, {
+                            status: 'cancelled',
+                            cancelledAt: new Date(),
+                            updatedAt: new Date(),
+                        }, { merge: true });
+                    }
                 }
             });
         }
@@ -82,7 +92,11 @@ export async function PATCH(req, { params }) {
             ...serializeFirestoreData(updatedSnapshot.data()),
         };
 
-        return NextResponse.json({ success: true, data: applicant });
+        const emailDelivery = !demoMode && shortlisted
+            ? await deliverQueuedEmail(db, `${id}-shortlisted`)
+            : { status: shortlisted ? 'demo' : 'cancelled' };
+
+        return NextResponse.json({ success: true, data: applicant, emailDelivery });
     } catch (error) {
         console.error('Error updating applicant:', error.message);
         const status = error?.code === 'NOT_FOUND' ? 404 : 400;

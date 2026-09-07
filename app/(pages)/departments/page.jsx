@@ -54,6 +54,9 @@ function resetCardPerspective(event) {
 function DepartmentCard({ department, active, submitted, disabled, onToggle }) {
   const index = reviewIndex.get(department.id);
   const Icon = department.icon;
+  const applicationHref = submitted
+    ? `/applications?department=${encodeURIComponent(department.name)}`
+    : `/join/${department.id}`;
 
   return (
     <motion.article
@@ -82,8 +85,8 @@ function DepartmentCard({ department, active, submitted, disabled, onToggle }) {
         ))}
       </div>
       <div className="department-card-actions">
-        <Link href={`/join/${department.id}`} aria-label={`View application for ${department.name}`}>
-          View application <ArrowRight size={16} />
+        <Link href={applicationHref} aria-label={`${submitted ? "View submitted response" : "View application"} for ${department.name}`}>
+          {submitted ? "View response" : "View application"} <ArrowRight size={16} />
         </Link>
         <button type="button" disabled={disabled} aria-pressed={active} aria-label={`${active ? "Remove" : "Select"} ${department.name}`} onClick={() => onToggle(department.id)}>
           <motion.span className="department-action-icon" key={active || submitted ? "checked" : "add"} initial={{ scale: 0.45, rotate: -35 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 520, damping: 24 }}>

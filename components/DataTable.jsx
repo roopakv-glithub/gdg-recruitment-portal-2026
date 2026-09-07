@@ -83,6 +83,7 @@ const DataTable = ({ data }) => {
       });
 
       if (res.ok) {
+        const result = await res.json();
         const updatedData = tableData.map((applicant) => {
           if (applicant._id === id) {
             console.log(
@@ -93,7 +94,10 @@ const DataTable = ({ data }) => {
           return applicant;
         });
         setTableData(updatedData);
-        toast.success("Student status updated!");
+        const delivery = result.emailDelivery?.status;
+        toast.success(!isShortlisted
+          ? delivery === "sent" ? "Student shortlisted and email sent!" : "Student shortlisted; email queued."
+          : "Student removed from shortlist.");
       } else {
         console.error("Failed to update applicant status.");
         throw new Error("Failed to update");

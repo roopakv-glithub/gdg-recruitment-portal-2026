@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ShieldCheck, Save, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, ShieldCheck, Save, UserRound } from "lucide-react";
 import { QuestionnaireData } from "@/constants";
 import { authClient } from "@/lib/auth-client";
 import { useSubmissions } from "@/components/SubmissionsProvider";
@@ -15,7 +15,7 @@ export default function FormComp({ dept1, dept2 }) {
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const departments = useMemo(() => [dept1,dept2].filter(Boolean),[dept1,dept2]);
-  const { submittedDepartments, markDepartmentsSubmitted } = useSubmissions();
+  const { submittedDepartments, isLoadingSubmissions, markDepartmentsSubmitted } = useSubmissions();
   const [values,setValues] = useState(emptyValues);
   const [answers,setAnswers] = useState({});
   const [ready,setReady] = useState(false);
@@ -60,8 +60,8 @@ export default function FormComp({ dept1, dept2 }) {
     } catch (err) { setError(`${completed.length ? `Saved ${completed.join(", ")}. ` : ""}${err.message} Your remaining answers are kept for retrying.`); }
     finally { setSubmitting(false); }
   }
-  if (success || (ready && pending.length === 0)) return <section className="journey-panel application-success"><CheckCircle2 size={52} /><span className="journey-eyebrow">STEP 03 · COMPLETE</span><h2>{success ? "You’re all set." : "Application already submitted."}</h2><p>Your applications for {departments.map(d=>d.name).join(" and ")} have been submitted.</p>{demoMode && <p>This is a demo submission; it resets when the local server restarts.</p>}<Link className="journey-primary" href="/departments">Back to departments <ArrowRight size={18} /></Link></section>;
-  if (!ready) return <div className="journey-panel" role="status">Preparing your saved answers…</div>;
+  if (success || (ready && pending.length === 0)) return <section className="journey-panel application-success"><CheckCircle2 size={52} /><span className="journey-eyebrow">STEP 03 · COMPLETE</span><h2>{success ? "You’re all set." : "Application already submitted."}</h2><p>Your applications for {departments.map(d=>d.name).join(" and ")} have been submitted and are locked from editing.</p>{demoMode && <p>This is a demo submission; it resets when the local server restarts.</p>}<div className="application-success-actions"><Link className="journey-primary" href="/applications"><ClipboardList size={18} /> View submitted applications</Link><Link className="journey-secondary" href="/departments"><ArrowLeft size={18} /> Back to departments</Link></div></section>;
+  if (!ready || isLoadingSubmissions) return <div className="journey-panel" role="status">Preparing your saved answers…</div>;
   return <div className="application-layout"><form className="application-form" onSubmit={submit}>
     {error && <div role="alert" className="journey-alert">{error}</div>}
     <fieldset disabled={submitting} className="journey-panel"><legend className="sr-only">About you</legend><div className="form-section-heading"><span className="section-icon"><UserRound size={23} /></span><div><h2>About you</h2><p>Let’s start with the basics. Fields marked * are required.</p></div><span className="section-number">01</span></div>

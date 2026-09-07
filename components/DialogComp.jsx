@@ -39,10 +39,14 @@ export default function DialogComp({ selectedApplicants }) {
             });
 
             if (res.ok) {
+                const result = await res.json();
                 const updatedStatus = [...shortlistStatus];
                 updatedStatus[index] = !isShortlisted;
                 setShortlistStatus(updatedStatus);
-                toast.success(`Applicant has been ${!isShortlisted ? 'shortlisted' : 'unshortlisted'}!`);
+                const delivery = result.emailDelivery?.status;
+                toast.success(!isShortlisted
+                    ? delivery === 'sent' ? 'Applicant shortlisted and email sent!' : 'Applicant shortlisted; email queued.'
+                    : 'Applicant removed from shortlist.');
             } else {
                 console.error("Failed to update applicant status.");
                 throw new Error("Failed to update");
