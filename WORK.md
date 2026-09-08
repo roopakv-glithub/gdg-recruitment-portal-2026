@@ -83,7 +83,7 @@ The server normalizes email and department, hashes them into stable IDs, and exe
 
 - Better Auth owns users, sessions, accounts, verification data, and the persistent role.
 - `ADMIN_EMAILS` bootstraps the first trusted administrators.
-- A prospective admin signs in, submits a reason, and receives a pending record.
+- A prospective admin signs in and creates a one-click pending request.
 - The first configured admin email receives a notification when SMTP is available.
 - Existing admins approve or reject from the admin panel. Approval changes the matching Better Auth user role to `admin`; the requester signs in again or refreshes the session to activate it.
 - Requests never grant privileges automatically.

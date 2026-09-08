@@ -45,7 +45,7 @@ export default function AdminSettings({ initialDeadline, initialRequests }) {
     </form>
     <div className="admin-control-card">
       <div className="admin-control-title"><ShieldCheck /><div><span>ACCESS CONTROL</span><h2>Admin requests <b>{pending.length}</b></h2></div></div>
-      {!pending.length ? <p>No pending requests.</p> : <div className="admin-request-list">{pending.map((request) => <article key={request.id}><div><strong>{request.name || "Unnamed user"}</strong><span>{request.email}</span><p>{request.reason}</p></div><div><button disabled={busy === request.id} onClick={() => review(request.id, "approved")}><ShieldCheck /> Approve</button><button className="reject" disabled={busy === request.id} onClick={() => review(request.id, "rejected")}><ShieldX /> Reject</button></div></article>)}</div>}
+      {!pending.length ? <p>No pending requests.</p> : <div className="admin-request-list">{pending.map((request) => <article key={request.id}><div><strong>{request.name || "Unnamed user"}</strong><span>{request.email}</span></div><div><button disabled={busy === request.id} onClick={() => review(request.id, "approved")}><ShieldCheck /> Approve</button><button className="reject" disabled={busy === request.id} onClick={() => review(request.id, "rejected")}><ShieldX /> Reject</button></div></article>)}</div>}
     </div>
   </section>;
 }

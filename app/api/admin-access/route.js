@@ -5,23 +5,21 @@ import { deliverQueuedEmail, emailDeliveryConfigured } from "@/lib/email-deliver
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request) {
+export async function POST() {
   const session = await getServerSession();
   if (!session?.user?.id || !session.user.email) return NextResponse.json({ error: "Sign in first" }, { status: 401 });
   if (session.user.role === "admin") return NextResponse.json({ error: "You already have admin access" }, { status: 409 });
-  const reason = String((await request.json())?.reason || "").trim().slice(0, 500);
-  if (reason.length < 10) return NextResponse.json({ error: "Briefly explain why you need access" }, { status: 400 });
   const db = await connect();
   const ref = db.collection("adminAccessRequests").doc(session.user.id);
   const existing = await ref.get();
   if (existing.exists && existing.data()?.status === "pending") return NextResponse.json({ status: "pending" });
-  const requestData = { userId: session.user.id, name: session.user.name || "", email: session.user.email.toLowerCase(), reason, status: "pending", requestedAt: new Date(), reviewedAt: null, reviewedBy: null };
+  const requestData = { userId: session.user.id, name: session.user.name || "", email: session.user.email.toLowerCase(), status: "pending", requestedAt: new Date(), reviewedAt: null, reviewedBy: null };
   await ref.set(requestData);
 
   const recipient = (process.env.ADMIN_EMAILS || "").split(",").map((value) => value.trim()).find(Boolean);
   if (recipient && emailDeliveryConfigured()) {
     const jobId = `admin-access-${session.user.id}-${Date.now()}`;
-    await db.collection("emailQueue").doc(jobId).set({ recipientEmail: recipient, subject: "New Recruitment Portal admin-access request", messageText: `${requestData.name} (${requestData.email}) requested admin access.\n\nReason: ${reason}\n\nReview it in the admin panel.`, status: "pending", attempts: 0, createdAt: new Date(), updatedAt: new Date(), idempotencyKey: jobId });
+    await db.collection("emailQueue").doc(jobId).set({ recipientEmail: recipient, subject: "New Recruitment Portal admin-access request", messageText: `${requestData.name} (${requestData.email}) requested admin access.\n\nReview it in the admin panel.`, status: "pending", attempts: 0, createdAt: new Date(), updatedAt: new Date(), idempotencyKey: jobId });
     await deliverQueuedEmail(db, jobId);
   }
   return NextResponse.json({ status: "pending" });
@@ -45,9 +43,10 @@ export async function PATCH(request) {
   const requestSnapshot = await requestRef.get();
   if (!requestSnapshot.exists || requestSnapshot.data().status !== "pending") return NextResponse.json({ error: "Request is no longer pending" }, { status: 409 });
   if (decision === "approved") {
-    const userSnapshot = await db.collection("user").where("id", "==", requestSnapshot.data().userId).limit(1).get();
-    if (userSnapshot.empty) return NextResponse.json({ error: "Better Auth user was not found" }, { status: 404 });
-    await userSnapshot.docs[0].ref.update({ role: "admin", updatedAt: new Date() });
+    const userRef = db.collection("users").doc(requestSnapshot.data().userId);
+    const userSnapshot = await userRef.get();
+    if (!userSnapshot.exists) return NextResponse.json({ error: "Better Auth user was not found" }, { status: 404 });
+    await userRef.update({ role: "admin", updatedAt: new Date() });
   }
   await requestRef.update({ status: decision, reviewedAt: new Date(), reviewedBy: adminSession.user.email });
   return NextResponse.json({ status: decision });
