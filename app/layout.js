@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SubmissionsProvider } from "@/components/SubmissionsProvider";
 import IntroExperience from "@/components/IntroExperience";
+import ColorCursor from "@/components/ColorCursor";
 // Styling
 import "./globals.css";
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="portal-theme" disableTransitionOnChange>
         <SubmissionsProvider>
           <IntroExperience />
+          <ColorCursor />
           {children}
           <Toaster />
         </SubmissionsProvider>

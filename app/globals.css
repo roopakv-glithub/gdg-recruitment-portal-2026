@@ -405,3 +405,33 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
   .journey-intro--departments > h1, .journey-intro--departments > p, .journey-intro--departments > .journey-eyebrow { max-width: none; }
   .department-hero-art { position: relative; top: auto; right: auto; width: 100%; height: auto; max-height: 250px; margin: 22px auto 0; }
 }
+/* Full frame video on every screen: no zoom or crop. */
+.site-intro-stage { inset: 0; animation: none; }
+.site-intro-video { object-fit: contain; transform: none; animation: none; filter: none; }
+.site-intro-vignette { background: none; box-shadow: none; }
+.site-intro-glow, .site-intro-frame { display: none; }
+.color-cursor { pointer-events: none; position: fixed; inset: 0; z-index: 10000; opacity: 0; }
+.color-cursor[data-visible] { opacity: 1; }
+.color-cursor > * { position: absolute; left: 0; top: 0; will-change: transform; }
+.color-cursor svg { margin: -4px 0 0 -5px; z-index: 4; filter: drop-shadow(0 2px 3px #0005); }
+.color-cursor i { border: 2px solid white; border-radius: 50%; box-shadow: 0 2px 4px #0004; }
+.cursor-red { width: 17px; height: 17px; margin: 15px; background: #ea4335; z-index: 3; }
+.cursor-yellow { width: 13px; height: 13px; margin: 27px; background: #fbbc04; z-index: 2; }
+.cursor-green { width: 10px; height: 10px; margin: 37px; background: #34a853; }
+@media (pointer: fine) and (hover: hover) {
+  .color-cursor-enabled, .color-cursor-enabled a, .color-cursor-enabled button { cursor: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .department-card.is-pointer-active { transform: perspective(1000px) translateY(-5px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) !important; box-shadow: 0 20px 45px #0003; }
+  .department-card.is-pointer-active::before { transform: scaleX(1); }
+  .department-card.is-pointer-active .department-card-glow { opacity: .65; }
+  .recruitment-notice { animation: portal-arrive .75s ease both; }
+  .recruitment-hero { animation: portal-arrive .95s ease both; }
+  .hero-illustration { animation: portal-art-float 7s ease-in-out infinite; }
+  .notice-icon { animation: portal-art-float 6s ease-in-out infinite; }
+  .journey-panel { animation: portal-arrive .6s ease both; }
+  .join-button, .journey-primary { transition: transform .25s ease, box-shadow .25s ease; }
+  .join-button:hover, .journey-primary:hover { transform: perspective(800px) translateY(-3px) rotateX(3deg); box-shadow: 0 12px 28px #4285f430; }
+}
+@keyframes portal-arrive { from { opacity: 0; transform: perspective(1200px) translateY(14px) rotateX(2deg); } to { opacity: 1; transform: none; } }
+@keyframes portal-art-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }

@@ -31,8 +31,9 @@ const cardMotion = {
 };
 
 function setCardPerspective(event) {
-  if (event.pointerType && event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const card = event.currentTarget;
+  card.classList.add("is-pointer-active");
   const bounds = card.getBoundingClientRect();
   const x = (event.clientX - bounds.left) / bounds.width;
   const y = (event.clientY - bounds.top) / bounds.height;
@@ -45,6 +46,7 @@ function setCardPerspective(event) {
 
 function resetCardPerspective(event) {
   const card = event.currentTarget;
+  card.classList.remove("is-pointer-active");
   card.style.setProperty("--pointer-x", "50%");
   card.style.setProperty("--pointer-y", "50%");
   card.style.setProperty("--tilt-x", "0deg");
@@ -65,6 +67,9 @@ function DepartmentCard({ department, active, submitted, disabled, onToggle }) {
       exit="exit"
       className={`department-card ${active ? "is-selected" : ""} ${submitted ? "is-submitted" : ""}`}
       style={{ "--department-color": googleColors[index % googleColors.length] }}
+      onPointerDown={setCardPerspective}
+      onPointerUp={resetCardPerspective}
+      onPointerCancel={resetCardPerspective}
       onPointerEnter={setCardPerspective}
       onPointerMove={setCardPerspective}
       onPointerLeave={resetCardPerspective}

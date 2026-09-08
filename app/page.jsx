@@ -16,7 +16,6 @@ export default function Home() {
             <ul>
               <li>Sign in with your email address to begin your application.</li>
               <li>You can apply to up to two departments.</li>
-              <li>Active session telemetry: <span className="telemetry-value">186</span></li>
             </ul>
           </div>
         </section>
