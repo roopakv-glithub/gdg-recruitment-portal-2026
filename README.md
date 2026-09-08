@@ -46,7 +46,7 @@ Set these variables in Vercel for the Production environment:
 - `NEXT_PUBLIC_DEMO_MODE=false`
 - `NEXT_PUBLIC_APP_URL=https://gdg-recruitment-portal-2026.vercel.app`
 
-Shortlisting creates one stable job at `emailQueue/{applicationId}-shortlisted` with the recipient, subject, plain-text message, and an idempotency key. Nodemailer claims that job transactionally, sends it once, and records `sent`, `pending`, `failed`, or `cancelled`. A previously sent job is preserved when an applicant is removed and re-added, preventing a second selection email.
+Each `false → true` shortlist transition creates one numbered job at `emailQueue/{applicationId}-shortlisted-{sequence}` with the recipient, subject, text/HTML message, and an idempotency key. Nodemailer claims that job transactionally, sends it once, and records `sent`, `pending`, `failed`, or `cancelled`. Repeated requests in the same state cannot duplicate a message, while deliberately unshortlisting and re-shortlisting creates a new auditable delivery event.
 
 For Gmail SMTP, enable two-step verification on the sender account, create a Google app password, and configure `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_SECURE=true`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, and `EMAIL_REPLY_TO` in Vercel. Never use the normal Google account password.
 

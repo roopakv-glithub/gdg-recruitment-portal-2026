@@ -98,7 +98,7 @@ export async function PATCH(req, { params }) {
 
         const docRef = db.collection('formData').doc(id);
         const selectedRef = db.collection('selectedApplicants').doc(id);
-        const queueRef = db.collection('emailQueue').doc(`${id}-shortlisted`);
+        let emailJobId = null;
 
         if (demoMode) {
             const snapshot = await docRef.get();
@@ -108,10 +108,7 @@ export async function PATCH(req, { params }) {
             await docRef.update({ shortlisted });
         } else {
             await db.runTransaction(async (transaction) => {
-                const [snapshot, queueSnapshot] = await Promise.all([
-                    transaction.get(docRef),
-                    transaction.get(queueRef),
-                ]);
+                const snapshot = await transaction.get(docRef);
                 if (!snapshot.exists) {
                     const error = new Error('Applicant not found');
                     error.code = 'NOT_FOUND';
@@ -120,10 +117,15 @@ export async function PATCH(req, { params }) {
 
                 const applicant = snapshot.data();
                 const wasShortlisted = Boolean(applicant.shortlisted);
+                const currentSequence = Number(applicant.shortlistEmailSequence || 0);
+                const nextSequence = shortlisted && !wasShortlisted
+                    ? currentSequence + 1
+                    : currentSequence;
                 transaction.update(docRef, {
                     shortlisted,
                     shortlistedAt: shortlisted ? new Date() : null,
                     shortlistedBy: session.user.email,
+                    shortlistEmailSequence: nextSequence,
                 });
 
                 if (shortlisted) {
@@ -136,13 +138,15 @@ export async function PATCH(req, { params }) {
                         selectedAt: new Date(),
                         selectedBy: session.user.email,
                     });
-                    const queueStatus = queueSnapshot.data()?.status;
-                    if (!queueSnapshot.exists || (!wasShortlisted && (queueStatus === 'cancelled' || queueStatus === 'failed'))) {
+                    if (!wasShortlisted) {
+                        emailJobId = `${id}-shortlisted-${nextSequence}`;
+                        const queueRef = db.collection('emailQueue').doc(emailJobId);
                         transaction.set(queueRef, {
                             ...shortlistEmail(applicant),
                             type: 'shortlisted',
                             deliveryChannel: 'nodemailer-smtp',
-                            idempotencyKey: `${id}-shortlisted`,
+                            idempotencyKey: emailJobId,
+                            shortlistSequence: nextSequence,
                             applicationId: id,
                             recipientEmail: applicant.Email,
                             recipientName: applicant.Name,
@@ -155,13 +159,6 @@ export async function PATCH(req, { params }) {
                     }
                 } else {
                     transaction.delete(selectedRef);
-                    if (queueSnapshot.exists && queueSnapshot.data()?.status !== 'sent') {
-                        transaction.set(queueRef, {
-                            status: 'cancelled',
-                            cancelledAt: new Date(),
-                            updatedAt: new Date(),
-                        }, { merge: true });
-                    }
                 }
             });
         }
@@ -173,9 +170,9 @@ export async function PATCH(req, { params }) {
             ...serializeFirestoreData(updatedSnapshot.data()),
         };
 
-        const emailDelivery = !demoMode && shortlisted
-            ? await deliverQueuedEmail(db, `${id}-shortlisted`)
-            : { status: shortlisted ? 'demo' : 'cancelled' };
+        const emailDelivery = !demoMode && emailJobId
+            ? await deliverQueuedEmail(db, emailJobId)
+            : { status: shortlisted ? (demoMode ? 'demo' : 'unchanged') : 'cancelled' };
 
         return NextResponse.json({ success: true, data: applicant, emailDelivery });
     } catch (error) {
