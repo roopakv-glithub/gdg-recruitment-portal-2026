@@ -30,7 +30,7 @@ import DialogComp from "./DialogComp";
 import { CSVLink } from "react-csv";
 import { CSV_Header } from "@/constants";
 
-const DataTable = ({ data }) => {
+const DataTable = ({ data, onDataChange }) => {
   const [tableData, setTableData] = useState(data);
 
   const [deptFiltered, setDeptFiltered] = useState(data);
@@ -84,7 +84,7 @@ const DataTable = ({ data }) => {
 
       if (res.ok) {
         const result = await res.json();
-        setTableData((current) => current.map((applicant) => {
+        const updateApplicant = (current) => current.map((applicant) => {
           if (applicant._id === id) {
             console.log(
               `Updating applicant with ID: ${id} to shortlisted status: ${!isShortlisted}`
@@ -92,7 +92,11 @@ const DataTable = ({ data }) => {
             return { ...applicant, shortlisted: !isShortlisted }; // Update in local state
           }
           return applicant;
-        }));
+        });
+        setTableData(updateApplicant);
+        setDeptFiltered(updateApplicant);
+        setShortFiltered(updateApplicant);
+        onDataChange?.(updateApplicant);
         const delivery = result.emailDelivery?.status;
         if (isShortlisted) {
           toast.success("Student removed from shortlist.");
@@ -115,7 +119,7 @@ const DataTable = ({ data }) => {
       console.error("Error occurred while updating the status:", error.message);
       toast.error("Failed to update status");
     }
-  }, []);
+  }, [onDataChange]);
 
   const columns = useMemo(
     () => [

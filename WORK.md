@@ -13,6 +13,7 @@ This document records the defects resolved, features added, architecture changes
 - Added a muted fullscreen intro for larger screens. It renders before the homepage, plays once per session, and is disabled on phones and for reduced-motion users.
 - Added an About GDG VITC widget covering 12 departments, 16 student leads, two maximum applications, and recruitment year 2026.
 - Added a live deadline widget with an explicit closed state and India-time display.
+- Added animated admin analytics with summary metrics, department distribution, shortlist progress, and restrained 3D depth.
 
 ## 2. Client-side optimization
 
