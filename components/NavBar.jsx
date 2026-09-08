@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { ClipboardList, UserRound, LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import ThemeToggle from "./ThemeToggle";
+import Image from "next/image";
 
 function AccountMenu({ user }) {
   const initials = (user.name || user.email || "User")
@@ -16,7 +17,7 @@ function AccountMenu({ user }) {
   return (
     <div className="account-menu">
       <button className="account-trigger" type="button" aria-haspopup="menu" aria-label="Open account menu">
-        {user.image ? <img src={user.image} alt="" referrerPolicy="no-referrer" /> : <span>{initials}</span>}
+        {user.image ? <Image src={user.image} alt="" width={49} height={49} referrerPolicy="no-referrer" unoptimized /> : <span>{initials}</span>}
       </button>
       <div className="account-popover" role="menu">
         <div className="account-identity">
@@ -44,8 +45,8 @@ export default function NavBar() {
     <header className="portal-header">
       <nav className="portal-nav" aria-label="Main navigation">
         <Link href="/" className="portal-brand">
-          <img className="theme-dark-image" src="/assets/reference-logo.png" width="123" height="73" alt="" />
-          <img className="theme-light-image" src="/assets/reference-logo-light.png" width="94" height="57" alt="" />
+          <Image className="theme-dark-image" src="/assets/reference-logo.png" width={123} height={73} alt="" priority />
+          <Image className="theme-light-image" src="/assets/reference-logo-light.png" width={94} height={57} alt="" priority />
           <span>Recruitment Portal</span>
         </Link>
         <div className="portal-nav-actions">

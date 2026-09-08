@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import {
@@ -161,6 +162,7 @@ export default function SignInPage() {
         </svg>
         Continue with your VIT Google account
       </button>
+      <Link className="admin-access-link" href="/admin/request">I’m an admin · Request admin access</Link>
       {passwordAuthEnabled && <>
       <div className="auth-divider"><span>or use email</span></div>
       <div className="auth-mode-switch">

@@ -12,8 +12,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata = {
-  title: "Organization Name | Recruitment Portal",
-  description: "Recruitment portal for Organization Name",
+  title: "GDG VITC | Recruitment Portal 2026",
+  description: "Apply to GDG on Campus, VIT Chennai departments for the 2026 recruitment cycle.",
 };
 
 export default function RootLayout({ children }) {

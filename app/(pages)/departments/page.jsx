@@ -9,6 +9,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { reviews } from "@/constants";
 import { useSubmissions } from "@/components/SubmissionsProvider";
+import Image from "next/image";
 
 const googleColors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"];
 const reviewById = new Map(reviews.map((department) => [department.id, department]));
@@ -131,8 +132,8 @@ export default function DepartmentsPage() {
           <span className="journey-eyebrow">RECRUITMENT 2026 · STEP 01</span>
           <h1>Find where you belong.</h1>
           <p>Explore our departments and choose where you want to make your mark.<br />Select up to two departments to start your application.</p>
-          <img className="department-hero-art theme-dark-image" src="/assets/departments-hero-dark-v3.png" alt="Students fitting department puzzle pieces together" width="1842" height="854" fetchPriority="high" />
-          <img className="department-hero-art theme-light-image" src="/assets/departments-hero-light.png" alt="Students fitting department puzzle pieces together" width="670" height="282" fetchPriority="high" />
+          <Image className="department-hero-art theme-dark-image" src="/assets/departments-hero-dark-v3.png" alt="Students fitting department puzzle pieces together" width={1842} height={854} priority sizes="(max-width: 760px) 100vw, 55vw" />
+          <Image className="department-hero-art theme-light-image" src="/assets/departments-hero-light.png" alt="Students fitting department puzzle pieces together" width={670} height={282} priority sizes="(max-width: 760px) 100vw, 55vw" />
           <div className="journey-steps"><strong><span>1</span> Choose departments</strong><i /><span><b>2</b> Your application</span><i /><span><b>3</b> Submit</span></div>
         </motion.header>
 

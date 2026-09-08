@@ -1,5 +1,5 @@
 "use client";
-import { React, useState, useEffect, useMemo } from "react";
+import { React, useState, useEffect, useMemo, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -68,9 +68,9 @@ const DataTable = ({ data }) => {
     } else {
       setTableData(data);
     }
-  }, [deptFiltered, shortFiltered]);
+  }, [data, deptFiltered, shortFiltered]);
 
-  const handleShortlist = async (id, isShortlisted) => {
+  const handleShortlist = useCallback(async (id, isShortlisted) => {
     console.log(
       `Shortlist button pressed for ID: ${id}, current status: ${isShortlisted}`
     );
@@ -84,7 +84,7 @@ const DataTable = ({ data }) => {
 
       if (res.ok) {
         const result = await res.json();
-        const updatedData = tableData.map((applicant) => {
+        setTableData((current) => current.map((applicant) => {
           if (applicant._id === id) {
             console.log(
               `Updating applicant with ID: ${id} to shortlisted status: ${!isShortlisted}`
@@ -92,8 +92,7 @@ const DataTable = ({ data }) => {
             return { ...applicant, shortlisted: !isShortlisted }; // Update in local state
           }
           return applicant;
-        });
-        setTableData(updatedData);
+        }));
         const delivery = result.emailDelivery?.status;
         if (isShortlisted) {
           toast.success("Student removed from shortlist.");
@@ -116,7 +115,7 @@ const DataTable = ({ data }) => {
       console.error("Error occurred while updating the status:", error.message);
       toast.error("Failed to update status");
     }
-  };
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -167,7 +166,7 @@ const DataTable = ({ data }) => {
         ),
       },
     ],
-    [tableData]
+    [handleShortlist]
   );
 
   const {

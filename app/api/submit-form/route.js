@@ -5,6 +5,7 @@ import { getServerSession } from "@/lib/server-auth";
 import { demoMode } from "@/lib/demo";
 import { normalizeDepartmentName } from "@/lib/department-names";
 import { reviews } from "@/constants";
+import { getRecruitmentSettings } from "@/lib/recruitment-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -64,21 +65,15 @@ function validateSubmission(payload) {
   };
 }
 
-function deadlineHasPassed() {
-  const configuredDeadline = process.env.APPLICATION_DEADLINE;
-  if (!configuredDeadline) return false;
-  const deadline = new Date(configuredDeadline);
-  return !Number.isNaN(deadline.valueOf()) && Date.now() > deadline.valueOf();
-}
-
 export async function POST(req) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
       return NextResponse.json({ message: "Authentication required" }, { status: 401 });
     }
-    if (!demoMode && deadlineHasPassed()) {
-      return NextResponse.json({ message: "The submission deadline has passed" }, { status: 403 });
+    if (!demoMode) {
+      const { deadline } = await getRecruitmentSettings();
+      if (deadline && Date.now() > new Date(deadline).valueOf()) return NextResponse.json({ message: "The submission deadline has passed" }, { status: 403 });
     }
 
     const validation = validateSubmission(await req.json());
