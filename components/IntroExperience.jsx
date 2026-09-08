@@ -14,10 +14,11 @@ export default function IntroExperience() {
   useEffect(() => {
     if (pathname !== "/") { setVisible(false); return; }
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isPhone = window.matchMedia("(max-width: 640px)").matches;
     let seen = false;
     try { seen = sessionStorage.getItem(SESSION_KEY) === "1"; } catch {}
-    setVisible(!reduceMotion && !seen);
-    if (!reduceMotion && !seen) {
+    setVisible(!isPhone && !reduceMotion && !seen);
+    if (!isPhone && !reduceMotion && !seen) {
       setExiting(false);
       document.documentElement.classList.add("intro-is-playing");
     }
