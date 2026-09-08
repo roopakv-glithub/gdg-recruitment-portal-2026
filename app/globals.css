@@ -410,7 +410,17 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .auth-card h1 { font-size: 30px; font-weight: 650; }
 .auth-card h2 { font-size: 22px; font-weight: 600; margin-bottom: 14px; }
 .auth-card p { color: hsl(var(--muted-foreground)); line-height: 1.7; margin-bottom: 20px; }
-.google-signin-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; margin: 24px 0 18px; padding: 11px 16px; border: 1px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--background)); color: hsl(var(--foreground)); font-size: 14px; font-weight: 600; transition: transform 160ms, border-color 160ms, box-shadow 160ms; }
+.auth-purpose-tabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 5px; margin: 24px 0; border: 1px solid hsl(var(--border)); border-radius: 13px; background: hsl(var(--muted) / .65); }
+.auth-purpose-tabs button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; padding: 9px 12px; border-radius: 9px; color: hsl(var(--muted-foreground)); font-size: 13px; font-weight: 650; transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease; }
+.auth-purpose-tabs button:hover { color: hsl(var(--foreground)); }
+.auth-purpose-tabs button.is-active { color: hsl(var(--primary)); background: hsl(var(--card)); box-shadow: 0 3px 12px #00000016, inset 0 0 0 1px hsl(var(--primary) / .18); transform: translateY(-1px); }
+.auth-purpose-tabs svg { width: 16px; height: 16px; }
+.auth-purpose-copy { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border: 1px solid hsl(var(--border)); border-radius: 12px; background: linear-gradient(135deg,hsl(var(--primary) / .07),transparent 70%); animation: auth-panel-in .24s ease both; }
+.auth-purpose-copy h2 { margin: 0 0 5px; font-size: 16px; }
+.auth-purpose-copy p { margin: 0; font-size: 13px; line-height: 1.55; }
+.auth-purpose-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 10px; color: hsl(var(--primary)); background: hsl(var(--primary) / .12); }
+.auth-purpose-icon svg { width: 19px; height: 19px; }
+.google-signin-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; margin: 18px 0 12px; padding: 11px 16px; border: 1px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--background)); color: hsl(var(--foreground)); font-size: 14px; font-weight: 600; transition: transform 160ms, border-color 160ms, box-shadow 160ms; }
 .google-signin-button:hover:not(:disabled) { transform: translateY(-1px); border-color: hsl(var(--primary) / .55); box-shadow: 0 7px 24px hsl(var(--primary) / .08); }
 .google-signin-button:disabled { cursor: wait; opacity: .65; }
 .google-signin-button svg { width: 20px; height: 20px; flex: none; }
@@ -423,7 +433,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .auth-card form label { display: inline-block; margin-bottom: 7px; font-size: 13px; font-weight: 500; }
 .auth-card form > button[type=submit] { width: 100%; min-height: 46px; margin-top: 5px; border-radius: 9px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-size: 14px; font-weight: 600; }
 .auth-card form > button[type=submit]:hover:not(:disabled) { filter: brightness(.94); }
-.admin-access-link { display: block; margin: 4px auto 8px; color: hsl(var(--primary)); font-size: 13px; text-align: center; }
+.auth-request-note { margin: 0 !important; padding: 0 8px; font-size: 11px; text-align: center; }
+@keyframes auth-panel-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .admin-request-page .admin-request-icon { width: 42px; height: 42px; margin-bottom: 18px; color: hsl(var(--primary)); }
 .admin-request-page strong { color: hsl(var(--foreground)); }
 .admin-request-page textarea { width: 100%; padding: 12px 14px; color: hsl(var(--foreground)); background: hsl(var(--background)); border: 1px solid hsl(var(--input)); border-radius: 9px; resize: vertical; }
