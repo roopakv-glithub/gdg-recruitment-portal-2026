@@ -316,7 +316,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .form-section-heading h2 { font-size: 23px; font-weight: 600; overflow-wrap: anywhere; }
 .form-section-heading p { color: hsl(var(--muted-foreground)); font-size: 13px; line-height: 1.65; margin-top: 5px; }
 .section-icon { display: grid; place-items: center; width: 46px; height: 46px; background: hsl(var(--secondary)); color: hsl(var(--primary)); border-radius: 12px; flex-shrink: 0; }
-.section-number { margin-left: auto; color: hsl(var(--muted-foreground)); font-size: 12px; }
+.section-number { margin-left: auto; color: hsl(var(--muted-foreground)); font-size: 12px; flex-shrink: 0; min-width: 2ch; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .personal-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 20px; }
 .application-form label { display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 500; }
 .application-form input, .application-form select, .application-form textarea, .auth-card input { display: block; width: 100%; border: 1px solid hsl(var(--input)); border-radius: 9px; background: hsl(var(--background)); color: hsl(var(--foreground)); padding: 12px 14px; font-size: 14px; font-weight: 400; line-height: 1.6; }
@@ -327,7 +327,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .long-field { margin-top: 24px; }
 .question-field + .question-field { margin-top: 26px; }
 .question-label { display: flex; gap: 11px; line-height: 1.7; overflow-wrap: anywhere; }
-.question-label b { color: hsl(var(--primary)); font-size: 11px; font-weight: 500; padding-top: 2px; }
+.question-label b { color: hsl(var(--primary)); font-size: 11px; font-weight: 500; padding-top: 2px; flex-shrink: 0; min-width: 2ch; white-space: nowrap; overflow-wrap: normal; font-variant-numeric: tabular-nums; }
 .application-sidebar { position: sticky; top: 24px; }
 .application-sidebar .journey-panel { padding: 25px; }
 .application-sidebar h3 { font-size: 21px; font-weight: 600; line-height: 1.5; margin: 14px 0 20px; }
