@@ -42,6 +42,8 @@ export default function IntroExperience() {
           autoPlay
           className="site-intro-video"
           muted
+          disablePictureInPicture
+          disableRemotePlayback
           onEnded={finish}
           onError={finish}
           playsInline
@@ -54,7 +56,7 @@ export default function IntroExperience() {
         <div className="site-intro-frame" aria-hidden="true" />
       </div>
       <button className="site-intro-skip" onClick={finish} type="button">
-        Skip intro
+        Enter website
         <span aria-hidden="true">→</span>
       </button>
     </section>

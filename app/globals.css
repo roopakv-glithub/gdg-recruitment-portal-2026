@@ -405,9 +405,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
   .journey-intro--departments > h1, .journey-intro--departments > p, .journey-intro--departments > .journey-eyebrow { max-width: none; }
   .department-hero-art { position: relative; top: auto; right: auto; width: 100%; height: auto; max-height: 250px; margin: 22px auto 0; }
 }
-/* Full frame video on every screen: no zoom or crop. */
+/* Treat the intro as an edge-to-edge scene matching the viewport. */
+.site-intro { width: 100%; height: 100dvh; }
 .site-intro-stage { inset: 0; animation: none; }
-.site-intro-video { object-fit: contain; transform: none; animation: none; filter: none; }
+.site-intro-video { display: block; object-fit: cover; object-position: 50% 50%; transform: none; animation: none; filter: none; }
+.site-intro-skip { bottom: max(24px, env(safe-area-inset-bottom)); }
+@media (orientation: portrait) { .site-intro-video { object-position: 50% 50%; } }
 .site-intro-vignette { background: none; box-shadow: none; }
 .site-intro-glow, .site-intro-frame { display: none; }
 .color-cursor { pointer-events: none; position: fixed; inset: 0; z-index: 10000; opacity: 0; }
