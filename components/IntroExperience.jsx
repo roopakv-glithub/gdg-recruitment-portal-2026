@@ -7,14 +7,18 @@ const SESSION_KEY = "recruitment-intro-seen";
 
 export default function IntroExperience() {
   const pathname = usePathname();
-  const [visible, setVisible] = useState(false);
+  // Render the cover with the initial HTML, before effects or video loading.
+  const [visible, setVisible] = useState(pathname === "/");
   const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    if (pathname !== "/") return;
+    if (pathname !== "/") { setVisible(false); return; }
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduceMotion && sessionStorage.getItem(SESSION_KEY) !== "1") {
-      setVisible(true);
+    let seen = false;
+    try { seen = sessionStorage.getItem(SESSION_KEY) === "1"; } catch {}
+    setVisible(!reduceMotion && !seen);
+    if (!reduceMotion && !seen) {
+      setExiting(false);
       document.documentElement.classList.add("intro-is-playing");
     }
     return () => document.documentElement.classList.remove("intro-is-playing");
@@ -22,7 +26,7 @@ export default function IntroExperience() {
 
   const finish = useCallback(() => {
     if (exiting) return;
-    sessionStorage.setItem(SESSION_KEY, "1");
+    try { sessionStorage.setItem(SESSION_KEY, "1"); } catch {}
     setExiting(true);
     window.setTimeout(() => {
       setVisible(false);

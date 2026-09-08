@@ -410,7 +410,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .site-intro-stage { inset: 0; animation: none; }
 .site-intro-video { display: block; object-fit: cover; object-position: 50% 50%; transform: none; animation: none; filter: none; }
 .site-intro-skip { bottom: max(24px, env(safe-area-inset-bottom)); }
-@media (orientation: portrait) { .site-intro-video { object-position: 50% 50%; } }
+@media (orientation: portrait) { .site-intro-video { object-position: 50% 50%; transform: scale(1.12); transform-origin: center; } }
+@media (prefers-reduced-motion: reduce) { .site-intro { display: none; } }
 .site-intro-vignette { background: none; box-shadow: none; }
 .site-intro-glow, .site-intro-frame { display: none; }
 .color-cursor { pointer-events: none; position: fixed; inset: 0; z-index: 10000; opacity: 0; }
