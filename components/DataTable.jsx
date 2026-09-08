@@ -95,9 +95,19 @@ const DataTable = ({ data }) => {
         });
         setTableData(updatedData);
         const delivery = result.emailDelivery?.status;
-        toast.success(!isShortlisted
-          ? delivery === "sent" ? "Student shortlisted and email sent!" : "Student shortlisted; email queued."
-          : "Student removed from shortlist.");
+        if (isShortlisted) {
+          toast.success("Student removed from shortlist.");
+        } else if (delivery === "sent") {
+          toast.success("Student shortlisted. Gmail accepted the email for delivery.");
+        } else if (delivery === "queued") {
+          toast.warning("Student shortlisted, but email delivery failed and is queued for retry.");
+        } else if (delivery === "unchanged") {
+          toast.info("Shortlist status was unchanged; no new email was sent.");
+        } else if (delivery === "demo") {
+          toast.info("Student shortlisted in demo mode; no email was sent.");
+        } else {
+          toast.warning("Student shortlisted, but email delivery was not confirmed.");
+        }
       } else {
         console.error("Failed to update applicant status.");
         throw new Error("Failed to update");
