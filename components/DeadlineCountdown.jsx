@@ -36,12 +36,11 @@ export default function DeadlineCountdown({ initialDeadline = null }) {
     return () => window.clearInterval(timer);
   }, [deadline]);
 
-  if (!deadline) return null;
   return <aside className="deadline-widget" aria-live="polite">
-    <div className="deadline-heading"><Clock3 aria-hidden="true" /><div><span>APPLICATION DEADLINE</span><strong>{time.closed ? "Applications closed" : "Time remaining"}</strong></div></div>
-    {!time.closed && <div className="deadline-units">
+    <div className="deadline-heading"><Clock3 aria-hidden="true" /><div><span>APPLICATION DEADLINE</span><strong>{!deadline ? "To be announced" : time.closed ? "Applications closed" : "Time remaining"}</strong></div></div>
+    {deadline && !time.closed && <div className="deadline-units">
       {[[time.days,"Days"],[time.hours,"Hours"],[time.minutes,"Minutes"],[time.seconds,"Seconds"]].map(([value,label]) => <div key={label}><b>{String(value).padStart(2,"0")}</b><span>{label}</span></div>)}
     </div>}
-    <time dateTime={deadline}>{new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(deadline))} IST</time>
+    {deadline ? <time dateTime={deadline}>{new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(deadline))} IST</time> : <p className="deadline-pending">An administrator will publish the closing time here.</p>}
   </aside>;
 }
