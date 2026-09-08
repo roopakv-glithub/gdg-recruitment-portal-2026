@@ -417,11 +417,11 @@ a:focus-visible, button:focus-visible { outline: 2px solid #91a8ff; outline-offs
 .color-cursor { pointer-events: none; position: fixed; inset: 0; z-index: 10000; opacity: 0; }
 .color-cursor[data-visible] { opacity: 1; }
 .color-cursor > * { position: absolute; left: 0; top: 0; will-change: transform; }
-.color-cursor svg { margin: -4px 0 0 -5px; z-index: 4; filter: drop-shadow(0 2px 3px #0005); }
+.color-cursor svg { width: 25px; height: 27px; margin: -4px 0 0 -5px; z-index: 4; filter: drop-shadow(0 2px 3px #0005); }
 .color-cursor i { border: 2px solid white; border-radius: 50%; box-shadow: 0 2px 4px #0004; }
-.cursor-red { width: 17px; height: 17px; margin: 15px; background: #ea4335; z-index: 3; }
-.cursor-yellow { width: 13px; height: 13px; margin: 27px; background: #fbbc04; z-index: 2; }
-.cursor-green { width: 10px; height: 10px; margin: 37px; background: #34a853; }
+.cursor-red { width: 14px; height: 14px; margin: 13px; background: #ea4335; z-index: 3; }
+.cursor-yellow { width: 11px; height: 11px; margin: 23px; background: #fbbc04; z-index: 2; }
+.cursor-green { width: 8px; height: 8px; margin: 31px; background: #34a853; }
 @media (pointer: fine) and (hover: hover) {
   .color-cursor-enabled, .color-cursor-enabled a, .color-cursor-enabled button { cursor: none; }
 }
