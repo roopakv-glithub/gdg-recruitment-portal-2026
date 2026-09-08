@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SubmissionsProvider } from "@/components/SubmissionsProvider";
+import IntroExperience from "@/components/IntroExperience";
 // Styling
 import "./globals.css";
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="portal-theme" disableTransitionOnChange>
         <SubmissionsProvider>
+          <IntroExperience />
           {children}
           <Toaster />
         </SubmissionsProvider>

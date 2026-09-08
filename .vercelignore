@@ -7,5 +7,6 @@ firebase-service-account.json
 .docx-qa/
 coverage/
 demo-server*.log
+/intro.mp4
 docs/
 firestore-security-analysis.md
